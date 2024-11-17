@@ -1,7 +1,7 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "./tsconfig.json", 
+    project: "./tsconfig.json",
     ecmaVersion: 2020,
     sourceType: "module",
     ecmaFeatures: {
@@ -28,6 +28,7 @@ module.exports = {
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
+    "react/jsx-pascal-case": "warn",
     "prettier/prettier": [
       "warn",
       {
@@ -41,7 +42,6 @@ module.exports = {
         endOfLine: "auto",
       },
     ],
-    "react/react-in-jsx-scope": "off",
   },
   env: {
     node: true,
