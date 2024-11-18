@@ -1,4 +1,5 @@
 import React, {useCallback} from "react";
+import {v4 as uuid4} from "uuid";
 import {
   ReactFlow,
   useNodesState,
@@ -7,19 +8,51 @@ import {
   NodeTypes,
   ConnectionMode,
   Controls,
+  Connection,
+  EdgeChange,
+  Edge,
 } from "@xyflow/react";
 import {ConnectionPoint, SourceNode} from "../../../components";
 import {CustomNodeData, NodeLabel} from "../domain/types";
 
 const nodeTypes: NodeTypes = {
-  custom: (props) => <ConnectionPoint {...props} label={props.data.label} />,
-  source: (props) => <SourceNode {...props} label={props.data.label} />,
+  custom: (props) => (
+    <ConnectionPoint {...props} label={props.data.label} isConnectable={props.isConnectable} />
+  ),
+  source: (props) => (
+    <SourceNode {...props} label={props.data.label} isConnectable={props.isConnectable} />
+  ),
 };
 
 const WorkflowEditor = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<CustomNodeData>([]);
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  const onConnect = useCallback(
+    (params: Connection | EdgeChange) => {
+      if ("source" in params && "target" in params) {
+        const newEdge: Edge = {
+          id: uuid4(),
+          source: params.source,
+          target: params.target,
+          type: "default",
+        };
+
+        setEdges((eds) => [...eds, newEdge]);
+
+        setNodes((nds) =>
+          nds.map((node) => {
+            if (node.id === params.source || node.id === params.target) {
+              return {...node, isConnectable: false};
+            }
+            return node;
+          }),
+        );
+      }
+    },
+    [setEdges, setNodes],
+  );
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -36,11 +69,12 @@ const WorkflowEditor = () => {
       const labelText = nodeType === "custom" ? NodeLabel.Custom : NodeLabel.Source;
 
       const newNode: CustomNodeData = {
-        id: `${Date.now()}`,
+        id: uuid4(),
         type: nodeType,
         position,
-        data: {label: labelText, connectionCount: "1"},
+        data: {label: labelText},
         measured: {width: 208, height: 118},
+        isConnectable: true,
       };
 
       setNodes((nds) => [...nds, newNode]);
@@ -65,7 +99,8 @@ const WorkflowEditor = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
-        connectionMode={ConnectionMode.Strict}
+        onConnect={onConnect}
+        connectionMode={ConnectionMode.Loose}
       >
         <Controls />
         <Background />

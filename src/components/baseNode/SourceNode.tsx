@@ -8,7 +8,7 @@ interface SourceProps {
   label: string;
 }
 
-function SourceNode({isConnectable, label}: SourceProps) {
+function SourceNode({label, isConnectable}: SourceProps) {
   const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
     const value: string = evt.target.value.trim();
     console.log("value: ", value);

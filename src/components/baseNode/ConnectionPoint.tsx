@@ -18,6 +18,7 @@ const ConnectionPoint: React.FC<SourceProps> = ({isConnectable, label}) => {
 
       <div className="flex flex-col items-center space-y-1">
         <Handle
+          id="a"
           type="source"
           position={Position.Left}
           className="bg-green-500 rounded-full w-3 h-3 shadow-sm"
