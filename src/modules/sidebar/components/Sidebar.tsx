@@ -1,4 +1,5 @@
 import React from "react";
+import {Card} from "../../../components";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,7 +8,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({isOpen, toggleMenu}) => {
   return (
-    <div className="relative">
+    <div className={`relative ${isOpen ? "w-60" : "w-16"} transition-all duration-300`}>
       <button
         className="absolute top-4 left-4 z-30 p-2 text-white bg-blue-600 rounded-md shadow-md"
         onClick={toggleMenu}
@@ -21,7 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({isOpen, toggleMenu}) => {
         } transition-transform duration-300 ease-in-out border-r border-white z-20`}
       >
         <div className="p-4 mt-16 overflow-y-auto h-full w-full">
-          <div className="w-full min-w-[220px]"></div>
+          <Card label="Source Node" nodeType="source" />
+          <Card label="Layer" nodeType="custom" />
         </div>
       </div>
     </div>
