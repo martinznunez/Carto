@@ -1,7 +1,6 @@
 export interface Data {
   label: string;
   [key: string]: string;
-  connectionCount: string;
 }
 
 export interface Position {
@@ -18,6 +17,7 @@ export interface CustomNodeData {
     width: number;
     height: number;
   };
+  isConnectable: boolean;
 }
 
 export enum NodeLabel {
