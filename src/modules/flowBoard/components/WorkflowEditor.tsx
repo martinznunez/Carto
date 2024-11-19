@@ -1,65 +1,36 @@
-import React, {useCallback} from "react";
-import {v4 as uuid4} from "uuid";
-import {
-  ReactFlow,
-  useNodesState,
-  useEdgesState,
-  Background,
-  NodeTypes,
-  ConnectionMode,
-  Controls,
-  Connection,
-  EdgeChange,
-  Edge,
-} from "@xyflow/react";
-import {ConnectionPoint, SourceNode} from "../../../components";
-import {CustomNodeData, NodeLabel} from "../domain/types";
+import React, {useState, useCallback} from "react";
+import {ReactFlow, Controls, Background, ConnectionMode} from "@xyflow/react";
+import {useNavigate} from "react-router-dom";
 
-const nodeTypes: NodeTypes = {
-  custom: (props) => (
-    <ConnectionPoint {...props} label={props.data.label} isConnectable={props.isConnectable} />
-  ),
-  source: (props) => (
-    <SourceNode {...props} label={props.data.label} isConnectable={props.isConnectable} />
-  ),
-};
+import useFlowState from "../hooks/useFlowState";
+import {HandleInputUrl, CustomNodeData, InputsNodes, NodeLabel} from "../domain/types";
+
+import {v4 as uuid4} from "uuid";
+import NodeTypesComponent from "./NodeTypesComponent";
+import {Button} from "../../../components";
+import {ROUTES} from "../../../routes/constants";
 
 const WorkflowEditor = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNodeData>([]);
+  const navigate = useNavigate();
+  const {nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, onConnect} =
+    useFlowState();
+  const [urls, setUrls] = useState<InputsNodes[]>([]);
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-
-  const onConnect = useCallback(
-    (params: Connection | EdgeChange) => {
-      if ("source" in params && "target" in params) {
-        const newEdge: Edge = {
-          id: uuid4(),
-          source: params.source,
-          target: params.target,
-          type: "default",
-        };
-
-        setEdges((eds) => [...eds, newEdge]);
-
-        setNodes((nds) =>
-          nds.map((node) => {
-            if (node.id === params.source || node.id === params.target) {
-              return {...node, isConnectable: false};
-            }
-            return node;
-          }),
-        );
-      }
-    },
-    [setEdges, setNodes],
-  );
+  const handleInputUrl: HandleInputUrl = (value, nodeId) => {
+    if (value !== "") {
+      setUrls((prevUrls) => {
+        const updatedUrls = prevUrls.filter((url) => url.nodeId !== nodeId);
+        return [...updatedUrls, {nodeId, value}];
+      });
+    } else {
+      setUrls((prevUrls) => prevUrls.filter((url) => url.nodeId !== nodeId));
+    }
+  };
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-
       const nodeType = event.dataTransfer.getData("application/reactflow");
-
       const target = event.target as HTMLElement;
       const position = {
         x: event.clientX - target.getBoundingClientRect().left,
@@ -72,7 +43,7 @@ const WorkflowEditor = () => {
         id: uuid4(),
         type: nodeType,
         position,
-        data: {label: labelText},
+        data: {label: labelText, handleInputUrl},
         measured: {width: 208, height: 118},
         isConnectable: true,
       };
@@ -87,18 +58,23 @@ const WorkflowEditor = () => {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
+  const handleClickButton = () => navigate(ROUTES.MAP);
+
   return (
     <div
       onDrop={onDrop}
       onDragOver={onDragOver}
-      className="h-full bg-[#F7F9FB] border-2 border-dashed border-gray-300 relative"
+      className="h-full bg-[#F7F9FB] border-2 border-dashed border-gray-300 relative flex flex-col items-end"
     >
+      <div className="mr-4 mt-4">
+        <Button handleClickButton={handleClickButton} valueText="Map" />
+      </div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
+        nodeTypes={NodeTypesComponent}
         onConnect={onConnect}
         connectionMode={ConnectionMode.Loose}
       >

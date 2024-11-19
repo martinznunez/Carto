@@ -1,6 +1,13 @@
+export type HandleInputUrl = (value: string, nodeId: string) => void;
+
+export interface InputsNodes {
+  value: string;
+  nodeId: string;
+}
 export interface Data {
   label: string;
-  [key: string]: string;
+  handleInputUrl: HandleInputUrl;
+  [key: string]: string | HandleInputUrl;
 }
 
 export interface Position {

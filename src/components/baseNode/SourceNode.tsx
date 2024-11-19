@@ -1,18 +1,24 @@
-import {useCallback} from "react";
 import {Handle, Position} from "@xyflow/react";
-import React from "react";
+import React, {useState} from "react";
 import "@xyflow/react/dist/style.css";
 
 interface SourceProps {
   isConnectable: boolean;
   label: string;
+  nodeId: string;
+  handleInputUrl: (value: string, nodeId: string) => void;
 }
 
-function SourceNode({label, isConnectable}: SourceProps) {
-  const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
-    const value: string = evt.target.value.trim();
-    console.log("value: ", value);
-  }, []);
+function SourceNode({label, isConnectable, nodeId, handleInputUrl}: SourceProps) {
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(evt.target.value.trim());
+  };
+
+  const onBlur = () => {
+    handleInputUrl(inputValue, nodeId);
+  };
 
   return (
     <div className="bg-white rounded-lg border-2 border-gray-300 p-2 w-40 shadow-sm flex flex-col justify-center items-center">
@@ -23,8 +29,11 @@ function SourceNode({label, isConnectable}: SourceProps) {
         <input
           id="text"
           name="text"
+          onBlur={onBlur}
+          placeholder="URL"
           onChange={onChange}
-          className="w-full p-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
+          className="w-full p-1 text-xs border border-gray-300 rounded-md bg-transparent focus:outline-none focus:ring-0"
+          autoComplete={"off"}
         />
       </div>
 

@@ -1,10 +1,10 @@
 import React, {useState} from "react";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {Sidebar} from "./modules/sidebar";
-import {WorkflowEditor} from "./modules/flowBoard";
+import {Sidebar} from "../../modules/sidebar";
+import {WorkflowEditor} from "../../modules/flowBoard";
 
-function App() {
+function FlowBoardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
@@ -30,4 +30,4 @@ function App() {
   );
 }
 
-export default App;
+export default FlowBoardLayout;
