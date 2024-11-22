@@ -2,11 +2,14 @@ import {useCallback} from "react";
 import {useNodesState, useEdgesState, Edge, Connection, EdgeChange} from "@xyflow/react";
 import {v4 as uuid4} from "uuid";
 import {CustomNodeData} from "../domain/types";
+import {getSessionStorage, saveSessionStorage} from "../../../utils/storage/sessionStorage";
 
 const useFlowState = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNodeData>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNodeData>(
+    getSessionStorage("nodes") || [],
+  );
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(getSessionStorage("edges") || []);
 
   const updateIsConnectable = useCallback(
     (nodeId: string, value: boolean) => {
@@ -34,6 +37,11 @@ const useFlowState = () => {
     [setEdges, updateIsConnectable],
   );
 
+  const handleSaveSessionStorage = () => {
+    saveSessionStorage("nodes", nodes);
+    saveSessionStorage("edges", edges);
+  };
+
   return {
     nodes,
     setNodes,
@@ -42,6 +50,7 @@ const useFlowState = () => {
     setEdges,
     onEdgesChange,
     onConnect,
+    handleSaveSessionStorage,
   };
 };
 

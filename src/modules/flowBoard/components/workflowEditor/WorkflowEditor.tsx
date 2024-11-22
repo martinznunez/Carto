@@ -1,31 +1,32 @@
-import React, {useState, useCallback} from "react";
+import React, {useCallback} from "react";
 import {ReactFlow, Controls, Background, ConnectionMode} from "@xyflow/react";
 import {useNavigate} from "react-router-dom";
 
-import useFlowState from "../hooks/useFlowState";
-import {HandleInputUrl, CustomNodeData, InputsNodes, NodeLabel} from "../domain/types";
+import useFlowState from "../../hooks/useFlowState";
+import {CustomNodeData, NodeLabel} from "../../domain/types";
 
 import {v4 as uuid4} from "uuid";
-import NodeTypesComponent from "./NodeTypesComponent";
-import {Button} from "../../../components";
-import {ROUTES} from "../../../routes/constants";
+import NodeTypesComponent from "../nodeTypesComponent/NodeTypesComponent";
+import {Button} from "../../../../components";
+import {ROUTES} from "../../../../routes/constants";
+
+import {useMapConnections} from "../../../../context/MapConnectionsContext";
+import {validationsEdges} from "./validations/validations";
 
 const WorkflowEditor = () => {
   const navigate = useNavigate();
-  const {nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, onConnect} =
-    useFlowState();
-  const [urls, setUrls] = useState<InputsNodes[]>([]);
+  const {addConnection} = useMapConnections();
 
-  const handleInputUrl: HandleInputUrl = (value, nodeId) => {
-    if (value !== "") {
-      setUrls((prevUrls) => {
-        const updatedUrls = prevUrls.filter((url) => url.nodeId !== nodeId);
-        return [...updatedUrls, {nodeId, value}];
-      });
-    } else {
-      setUrls((prevUrls) => prevUrls.filter((url) => url.nodeId !== nodeId));
-    }
-  };
+  const {
+    nodes,
+    setNodes,
+    onNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+    onConnect,
+    handleSaveSessionStorage,
+  } = useFlowState();
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -43,9 +44,10 @@ const WorkflowEditor = () => {
         id: uuid4(),
         type: nodeType,
         position,
-        data: {label: labelText, handleInputUrl},
+        data: {label: labelText, inputValue: ""},
         measured: {width: 208, height: 118},
         isConnectable: true,
+        selected: false,
       };
 
       setNodes((nds) => [...nds, newNode]);
@@ -58,7 +60,13 @@ const WorkflowEditor = () => {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  const handleClickButton = () => navigate(ROUTES.MAP);
+  const disabledButton: boolean = validationsEdges(edges, nodes);
+
+  const handleClickButton = () => {
+    addConnection(edges, nodes);
+    handleSaveSessionStorage();
+    navigate(ROUTES.MAP);
+  };
 
   return (
     <div
@@ -66,9 +74,15 @@ const WorkflowEditor = () => {
       onDragOver={onDragOver}
       className="h-full bg-[#F7F9FB] border-2 border-dashed border-gray-300 relative flex flex-col items-end"
     >
-      <div className="mr-4 mt-4">
-        <Button handleClickButton={handleClickButton} valueText="Map" />
+      <div className="mr-2 mt-1">
+        <Button
+          isDisabled={!disabledButton}
+          handleClickButton={handleClickButton}
+          valueText="Map"
+        />
+        <Button handleClickButton={handleSaveSessionStorage} valueText="save" />
       </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}

@@ -1,13 +1,11 @@
-export type HandleInputUrl = (value: string, nodeId: string) => void;
-
 export interface InputsNodes {
-  value: string;
+  url: string;
   nodeId: string;
 }
 export interface Data {
   label: string;
-  handleInputUrl: HandleInputUrl;
-  [key: string]: string | HandleInputUrl;
+  [key: string]: string;
+  inputValue: string;
 }
 
 export interface Position {
@@ -16,6 +14,7 @@ export interface Position {
 }
 
 export interface CustomNodeData {
+  selected: boolean;
   id: string;
   type: string;
   data: Data;
