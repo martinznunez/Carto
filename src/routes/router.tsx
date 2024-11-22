@@ -4,6 +4,7 @@ import {FlowBoardLayout, PageNotFound} from "../components";
 import {ROUTES} from "./constants";
 import React from "react";
 import {Map} from "../modules/map";
+import {MapConnectionsProvider} from "../context/MapConnectionsContext";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,11 @@ const router = createBrowserRouter([
 ]);
 
 const Router = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <MapConnectionsProvider>
+      <RouterProvider router={router} />
+    </MapConnectionsProvider>
+  );
 };
 
 export default Router;

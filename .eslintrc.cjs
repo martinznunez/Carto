@@ -23,7 +23,6 @@ module.exports = {
     },
   },
   rules: {
-    "@typescript-eslint/no-unused-vars": ["warn"],
     "no-console": "warn",
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
@@ -42,6 +41,8 @@ module.exports = {
         endOfLine: "auto",
       },
     ],
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-unused-vars": "off",
   },
   env: {
     node: true,

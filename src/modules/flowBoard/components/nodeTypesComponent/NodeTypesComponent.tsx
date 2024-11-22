@@ -1,6 +1,6 @@
 import React from "react";
 import {NodeTypes} from "@xyflow/react";
-import {ConnectionPoint, SourceNode} from "../../../components";
+import {ConnectionPoint, SourceNode} from "../../../../components";
 
 const NodeTypesComponent: NodeTypes = {
   custom: (props) => (
@@ -12,7 +12,7 @@ const NodeTypesComponent: NodeTypes = {
       label={props.data.label}
       isConnectable={props.isConnectable}
       nodeId={props.id}
-      handleInputUrl={props.data.handleInputUrl}
+      inputValue={props.data.inputValue}
     />
   ),
 };

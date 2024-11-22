@@ -1,1 +1,3 @@
-export {default as WorkflowEditor} from "./components/WorkflowEditor";
+export * from "./components/input";
+export * from "./components/nodeTypesComponent";
+export * from "./components/workflowEditor";
