@@ -1,8 +1,9 @@
 import {GeoJsonLayer, IconLayer, PathLayer} from "deck.gl";
-import {LAYER_TYPES} from "../layerTypes.ts/types";
+
 import {v4 as uuid4} from "uuid";
 import {LAYER_STYLES} from "../layerStyled";
 import type {Feature} from "geojson";
+import {LAYER_TYPES} from "../layerTypes";
 
 export const applyRegularLayers = (geoJsonData: {
   type: string;

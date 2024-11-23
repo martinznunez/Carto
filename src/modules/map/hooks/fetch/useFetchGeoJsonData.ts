@@ -3,13 +3,17 @@ import {useMapConnections} from "../../../../context/MapConnectionsContext";
 import {GeoJsonLayer} from "@deck.gl/layers";
 import {applyRegularLayers} from "../../utils/settingMapGeo";
 import {Layer, Viewport} from "deck.gl";
-import {MjolnirGestureEvent} from "mjolnir.js";
+import {MjolnirPointerEvent} from "mjolnir.js";
+import {listSortMap} from "../../utils/listSortMap/listSortMap";
+import {ErrorAlert} from "../../domain/types";
+import {ERROR_MESSAGES} from "./constants/errorsMessages";
 
 const useFetchGeoJsonData = () => {
   const [layers, setLayers] = useState<GeoJsonLayer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<ErrorAlert[]>([]);
 
-  const [clickedFeature, setClickedFeature] = useState<string | null>(null);
+  const [hoveredFeature, setHoveredFeature] = useState<string | null>(null);
   const {connections} = useMapConnections();
 
   useEffect(() => {
@@ -22,33 +26,40 @@ const useFetchGeoJsonData = () => {
 
         setLoading(true);
 
+        const sortedConnections = listSortMap(connections);
+
         const results = await Promise.allSettled(
-          connections.map(async (connection) => {
-            try {
-              const response = await fetch(connection.source.url);
+          sortedConnections.map(async (connection) => {
+            const response = await fetch(connection.source.url);
 
-              if (!response.ok) {
-                throw new Error(`Error fetching GeoJSON: ${connection.source.url}`);
-              }
-
-              const geoJson = await response.json();
-
-              const geoJsonLayer = applyRegularLayers(geoJson);
-
-              return geoJsonLayer;
-            } catch (error) {
-              return null;
+            if (!response.ok) {
+              throw new Error(ERROR_MESSAGES.unexpected);
             }
+
+            const geoJson = await response.json();
+            return applyRegularLayers(geoJson);
           }),
         );
 
-        const newLayers = results
-          .filter((result) => result.status === "fulfilled" && result.value !== null)
+        const successfulLayers = results
+          .filter((result) => result.status === "fulfilled")
           .map((result) => (result as PromiseFulfilledResult<GeoJsonLayer>).value);
 
-        setLayers(newLayers);
+        const failedLayers = results.filter((result) => result.status === "rejected");
+
+        if (failedLayers.length > 0) {
+          setError((prevState) => [
+            ...prevState,
+            ...failedLayers.map((failure) => ({
+              showAlert: true,
+              message: ERROR_MESSAGES.unexpected,
+            })),
+          ]);
+        }
+
+        setLayers(successfulLayers);
       } catch (error) {
-        return null;
+        setError((prevState) => [...prevState, {showAlert: true, message: ERROR_MESSAGES.fatal}]);
       } finally {
         setLoading(false);
       }
@@ -57,7 +68,7 @@ const useFetchGeoJsonData = () => {
     fetchGeoJsonData();
   }, [connections]);
 
-  const handleClick = (
+  const handleHover = (
     info: {
       color: Uint8Array | null;
       layer: Layer<object> | null;
@@ -66,14 +77,16 @@ const useFetchGeoJsonData = () => {
       pixelRatio: number;
       object?: {properties: {name: string}};
     },
-    event: MjolnirGestureEvent,
+    event: MjolnirPointerEvent,
   ) => {
     if (info.object && info.object.properties && info.object.properties.name) {
-      setClickedFeature(info.object.properties.name || "");
+      setHoveredFeature(info.object.properties.name || "");
+    } else {
+      setHoveredFeature(null);
     }
   };
 
-  return {layers, loading, clickedFeature, handleClick};
+  return {layers, loading, hoveredFeature, handleHover, error, setError};
 };
 
 export default useFetchGeoJsonData;

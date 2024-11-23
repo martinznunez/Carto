@@ -1,3 +1,5 @@
+import {ConnectionType} from "../../../../context/types";
+
 export const LAYER_TYPES = {
   POLYGON: "Polygon",
   MULTI_POLYGON: "MultiPolygon",
@@ -6,3 +8,5 @@ export const LAYER_TYPES = {
   LINE_STRING: "LineString",
   MULTI_LINE_STRING: "MultiLineString",
 };
+
+export type MappedConnectionType = ConnectionType;
