@@ -14,7 +14,8 @@ export const LAYER_STYLES = {
     iconMapping: {
       marker: {x: 0, y: 0, width: 128, height: 128, anchorX: 64, anchorY: 64},
     },
-    sizeScale: 20,
+    sizeScale: 14,
+
     getIcon: () => "marker",
     getColor: (d: {properties: {isActive: boolean}}) => {
       return d.properties.isActive ? [0, 255, 0, 255] : [255, 0, 0, 255];
