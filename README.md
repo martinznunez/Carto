@@ -44,6 +44,11 @@ Here are some screenshots showcasing the interface and map views:
   
   <p><strong>Map View - 2</strong></p>
   <img width="600" src="https://github.com/user-attachments/assets/119e93da-f3e9-4b09-8402-aaadad997289" alt="Map Screenshot 2">
+
+
+  <p><strong>Map View - 3</strong></p>
+  <img width="600" src="https://github.com/user-attachments/assets/f978b1dd-2cdc-4207-9dca-a8fd4e3d8481" alt="Map Screenshot 3">
+
 </div>
 
 ---
@@ -56,15 +61,13 @@ To set up the project on your local machine, follow these steps:
 npm install
 npm run dev
 
-
-VITE_MAP_BOX_API_KEY=key 
-
+```
 
 Here there are some sources you can use to play around:
 
-```
+VITE_MAP_BOX_API_KEY=key 
+
 https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/san-francisco.geojson
 https://raw.githubusercontent.com/dwillis/nyc-maps/master/boroughs.geojson
 https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/chicago.geojson
 https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/bart.geo.json
-```
